@@ -1,4 +1,4 @@
-#Graphics Team Based Project
+GRAPHICS TEAM BASED PROJECT<br>
 Kelompok 10 :<br>
 
 2101020031 - Ahmad Ulil Absor<br>
