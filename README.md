@@ -1,10 +1,11 @@
-Graphics Team Based Project
-Kelompok 10 :
+#Graphics Team Based Project
+Kelompok 10 :<br>
 
-2101020031 - Ahmad Ulil Absor
-2201020023 - Mohd. Alifyan Baitulnesam
-2201020090 - Analisari Putri
-2201020098 - Muhammad Rifqi
-2101020033 - M. Syafiq Haiqal
+2101020031 - Ahmad Ulil Absor<br>
+2101020033 - M. Syafiq Haiqal<br>
+2201020023 - Mohd. Alifyan Baitulnesam<br>
+2201020090 - Analisari Putri<br>
+2201020098 - Muhammad Rifqi<br>
 
-Final Report - https://docs.google.com/document/d/1JTmnWsmPYirh_A90twCyaXqdiuUu804I-ehCdTJhmUs/edit?usp=sharing
+
+Final Report - https://docs.google.com/document/d/1JTmnWsmPYirh_A90twCyaXqdiuUu804I-ehCdTJhmUs/edit?usp=sharing<br>
