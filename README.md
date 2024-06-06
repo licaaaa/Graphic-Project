@@ -1,7 +1,6 @@
-GRAPHICS TEAM BASED PROJECT<br>
-Dosen Pengampu : Tekad Matulatan, S.Sos, S.Kom, M.Inf.Tech<br>
+GRAPHICS TEAM BASED PROJECT - 3D BATHROOM<br>
 
-3D BATHROOM<BR>
+Dosen Pengampu : Tekad Matulatan, S.Sos, S.Kom, M.Inf.Tech<br>
 
 Kelompok 10 :<br>
 2101020031 - Ahmad Ulil Absor<br>
