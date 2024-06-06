@@ -1,6 +1,9 @@
 GRAPHICS TEAM BASED PROJECT<br>
-Kelompok 10 :<br>
+Dosen Pengampu : Tekad Matulatan, S.Sos, S.Kom, M.Inf.Tech<br>
 
+3D BATHROOM<BR>
+
+Kelompok 10 :<br>
 2101020031 - Ahmad Ulil Absor<br>
 2101020033 - M. Syafiq Haiqal<br>
 2201020023 - Mohd. Alifyan Baitulnesam<br>
