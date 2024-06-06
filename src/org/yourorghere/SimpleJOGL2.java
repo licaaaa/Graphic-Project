@@ -13,9 +13,23 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLU;
 import javax.media.opengl.glu.GLUquadric;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import javax.imageio.ImageIO;
+import javax.media.opengl.GL;
+import javax.media.opengl.glu.GLU;
+import com.sun.opengl.util.texture.Texture;
+import com.sun.opengl.util.texture.TextureIO;
+import java.io.IOException;
+import javax.media.opengl.*;
+import javax.media.opengl.glu.*;
+
 
 public class Bathroom3D implements GLEventListener, KeyListener {
 
+    private Texture floorTexture;
+    private Texture wallTexture;
+    
     private float rotationAngle = 0.0f; // Sudut rotasi kubus
     private float rotationAngleX = 0.0f; // Sudut rotasi kubus pada sumbu X
     private float cameraX = 0.0f;
@@ -23,6 +37,20 @@ public class Bathroom3D implements GLEventListener, KeyListener {
     private float doorRotation = 0.0f; // Sudut rotasi pintu
     private GLCanvas canvas; // Variabel untuk GLCanvas
 
+    public void loadTextures(GL gl) {
+        try {
+            File floorFile = new File("src/org/yourorghere/wall.jpg");
+            BufferedImage floorImage = ImageIO.read(floorFile);
+            floorTexture = TextureIO.newTexture(floorImage, true);
+
+            File wallFile = new File("src/org/yourorghere/wood.png");
+            BufferedImage wallImage = ImageIO.read(wallFile);
+            wallTexture = TextureIO.newTexture(wallImage, true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    
     public static void main(String[] args) {
         Frame frame = new Frame("3D Bathroom");
         GLCanvas canvas = new GLCanvas();
@@ -60,66 +88,273 @@ public class Bathroom3D implements GLEventListener, KeyListener {
         gl.glEnable(GL.GL_DEPTH_TEST);
         gl.glDepthFunc(GL.GL_LEQUAL);
         gl.glHint(GL.GL_PERSPECTIVE_CORRECTION_HINT, GL.GL_NICEST);
+        loadTextures(gl); // Load textures
+        
     }
 
-   public void display(GLAutoDrawable drawable) {
+    
+     @Override
+public void display(GLAutoDrawable drawable) {
     GL gl = drawable.getGL();
 
     gl.glClear(GL.GL_COLOR_BUFFER_BIT | GL.GL_DEPTH_BUFFER_BIT);
     gl.glLoadIdentity();
     GLU glu = new GLU();
+    
+    // Set the camera position
+    glu.gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
 
-    // Draw Thin Floor
-    gl.glColor3f(0.5f, 0.5f, 0.5f); // Grey
+    // Draw 3D Cube
+    gl.glTranslatef(0.0f, 0.0f, -6.0f);
+    gl.glTranslatef(cameraX, 0.0f, cameraZ); // Menggeser posisi kamera
+    gl.glRotatef(rotationAngleX, 1.0f, 0.0f, 0.0f); // Rotasi pada sumbu X
+    gl.glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotasi pada sumbu Y
     gl.glBegin(GL.GL_QUADS);
-    gl.glVertex3f(-2.0f, 0.0f, -2.0f);
-    gl.glVertex3f(2.0f, 0.0f, -2.0f);
-    gl.glVertex3f(2.0f, 0.0f, 2.0f);
-    gl.glVertex3f(-2.0f, 0.0f, 2.0f);
+    
+
+//    gl.glColor3f(0.0f, 1.0f, 1.0f); // Cyan
+//    gl.glBegin(GL.GL_QUADS);
+
+gl.glEnable(GL.GL_TEXTURE_2D);
+wallTexture.bind(); // Bind the loaded texture
+gl.glBegin(GL.GL_QUADS); 
+    gl.glColor3f(1.0f, 1.0f, 1.0f); 
+    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Left
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(1.2f, -1.0f, -1.0f);  // Bottom Right
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(1.2f, 1.0f, -1.0f);   // Top Right
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.5f, 1.0f, -1.0f);  // Top Left
+gl.glEnd();
+    gl.glDisable(GL.GL_TEXTURE_2D);
+
+    
+//    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Left
+//gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(1.2f, -1.0f, -1.0f);  // Bottom Right
+//gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(1.2f, 1.0f, -1.0f);   // Top Right
+//gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-1.5f, 1.0f, -1.0f);  // Top Left
+    
+//    // Draw Floor with Texture
+gl.glEnable(GL.GL_TEXTURE_2D);
+wallTexture.bind(); // Bind the loaded texture
+gl.glBegin(GL.GL_QUADS);
+gl.glColor3f(1.0f, 1.0f, 1.0f);
+//    gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Left
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-1.5f, -1.0f, 1.5f); // Top Left
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(1.2f, -1.0f, 1.5f); // Top Right
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(1.2f, -1.0f, -1.0f); // Bottom Right
+    gl.glEnd();
+    gl.glDisable(GL.GL_TEXTURE_2D);
+
+    // Draw Left face (Cyan Wall)
+//    gl.glColor3f(0.0f, 1.0f, 1.0f); // Cyan
+//    gl.glBegin(GL.GL_QUADS);
+
+gl.glEnable(GL.GL_TEXTURE_2D);
+floorTexture.bind(); // Bind the loaded texture
+gl.glBegin(GL.GL_QUADS);
+    gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Front
+    gl.glTexCoord2f(0.0f, 1.0f);gl.glVertex3f(-1.5f, -1.0f, 1.5f); // Top Front
+    gl.glTexCoord2f(1.0f, 1.0f);gl.glVertex3f(-1.5f, 1.0f, 1.5f); // Top Back
+    gl.glTexCoord2f(1.0f, 0.0f);gl.glVertex3f(-1.5f, 1.0f, -1.0f); // Bottom Back
+    gl.glEnd();
+gl.glDisable(GL.GL_TEXTURE_2D);
+    
+    // Draw Door
+    gl.glPushMatrix();
+    gl.glTranslatef(-0.1f, -1.0f, -0.99f); // Pintu diletakkan di depan dinding, sejajar dengan lantai
+    gl.glRotatef(doorRotation, 0.0f, 1.0f, 0.0f); // Rotasi pintu
+    gl.glColor3f(0.5f, 0.35f, 0.05f); // Brown
+    gl.glBegin(GL.GL_QUADS);
+    gl.glVertex3f(-0.2f, 0.0f, 0.0f);
+    gl.glVertex3f(0.2f, 0.0f, 0.0f);
+    gl.glVertex3f(0.2f, 1.0f, 0.01f); // Mengubah tinggi pintu menjadi 1.0f
+    gl.glVertex3f(-0.2f, 1.0f, 0.0f); // Mengubah koordinat x menjadi -0.2f
+    gl.glEnd();
+    gl.glPopMatrix();
+    
+    // Draw Bathtub
+    gl.glPushMatrix();
+    gl.glTranslatef(0.0f, -0.96f, 1.0f); // Menempatkan bak mandi di tengah ruangan, sedikit di atas lantai
+    gl.glColor3f(0.5f, 0.5f, 0.5f); // Abu-abu
+    gl.glEnable(GL.GL_TEXTURE_2D);
+//bathtubTexture.bind(); // Mengikat tekstur yang dimuat
+
+    // Draw the faces of the bathtub
+    // Front face (outer)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.0f, 0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.0f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+gl.glEnd();
+
+// Front face (inner)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.4f, 0.0f, 0.3f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.4f, 0.0f, 0.3f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+gl.glEnd();
+
+// Top face (front)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+gl.glEnd();
+
+// Back face (outer)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.0f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.0f, -0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.45f, 0.5f, -0.35f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+gl.glEnd();
+
+// Back face (inner)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.4f, 0.0f, -0.3f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.4f, 0.0f, -0.3f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, -0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+gl.glEnd();
+
+    // Top face (back)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.5f, -0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, -0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+gl.glEnd();
+
+// Left face (outer)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.0f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-0.45f, 0.0f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+gl.glEnd();
+
+// Left face (inner)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.4f, 0.0f, -0.3f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-0.4f, 0.0f, 0.3f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+gl.glEnd();
+
+// Top face (left)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+gl.glEnd();
+    
+    // Right face (outer)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0.45f, 0.0f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.0f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0.45f, 0.5f, -0.35f);
+gl.glEnd();
+
+// Right face (inner)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0.4f, 0.0f, -0.3f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.4f, 0.0f, 0.3f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, -0.3f);
+gl.glEnd();
+
+// Top face (right)
+gl.glBegin(GL.GL_QUADS);
+gl.glTexCoord2f(0.0f, 0.0f); gl.glVertex3f(0.45f, 0.5f, -0.35f);
+gl.glTexCoord2f(1.0f, 0.0f); gl.glVertex3f(0.45f, 0.5f, 0.35f);
+gl.glTexCoord2f(1.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, 0.3f);
+gl.glTexCoord2f(0.0f, 1.0f); gl.glVertex3f(0.4f, 0.5f, -0.3f);
+gl.glEnd();
+
+    // Top face (right)
+    gl.glBegin(GL.GL_QUADS);
+    gl.glVertex3f(0.45f, 0.5f, -0.35f);
+    gl.glVertex3f(0.45f, 0.5f, 0.35f);
+    gl.glVertex3f(0.4f, 0.5f, 0.3f);
+    gl.glVertex3f(0.4f, 0.5f, -0.3f);
     gl.glEnd();
 
-        // Draw 3D Cube
-        gl.glTranslatef(0.0f, 0.0f, -6.0f);
-        gl.glTranslatef(cameraX, 0.0f, cameraZ); // Menggeser posisi kamera
-        gl.glRotatef(rotationAngleX, 1.0f, 0.0f, 0.0f); // Rotasi pada sumbu X
-        gl.glRotatef(rotationAngle, 0.0f, 1.0f, 0.0f); // Rotasi pada sumbu Y
-        gl.glBegin(GL.GL_QUADS);
+    // Draw lines around the edges of the bathtub
+    gl.glLineWidth(2.0f); // Increase line width
+    gl.glColor3f(0.0f, 0.0f, 0.0f); // Black
 
-        // Back face (Green Wall)
-        gl.glColor3f(0.0f, 1.0f, 0.0f); // Green
-        gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Left
-        gl.glVertex3f(1.5f, -1.0f, -1.0f); // Bottom Right
-        gl.glVertex3f(1.5f, 1.0f, -1.0f); // Top Right
-        gl.glVertex3f(-1.5f, 1.0f, -1.0f); // Top Left
+       gl.glEnable(GL.GL_TEXTURE_2D); // Enable texture mapping
+    // Front face (outer)
+    gl.glBegin(GL.GL_LINE_LOOP);
+    gl.glTexCoord2f(0.0f, 0.0f);gl.glVertex3f(-0.45f, 0.0f, 0.35f);
+    gl.glTexCoord2f(1.0f, 0.0f);gl.glVertex3f(0.45f, 0.0f, 0.35f);
+    gl.glTexCoord2f(1.0f, 1.0f);gl.glVertex3f(0.45f, 0.5f, 0.35f);
+    gl.glTexCoord2f(1.0f, 1.0f);gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+    gl.glEnd();
 
-        // Bottom face (Grey Floor)
-        gl.glColor3f(0.7f, 0.7f, 0.7f); // Grey
-        gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Left
-        gl.glVertex3f(-1.5f, -1.0f, 1.5f); // Top Left
-        gl.glVertex3f(1.5f, -1.0f, 1.5f); // Top Right
-        gl.glVertex3f(1.5f, -1.0f, -1.0f); // Bottom Right
+    // Front face (inner)
+    gl.glEnable(GL.GL_TEXTURE_2D); // Enable texture mapping
+    gl.glBegin(GL.GL_LINE_LOOP);
+    gl.glTexCoord2f(0.0f, 0.0f);gl.glVertex3f(-0.4f, 0.0f, 0.3f);
+    gl.glTexCoord2f(1.0f, 0.0f);gl.glVertex3f(0.4f, 0.0f, 0.3f);
+    gl.glTexCoord2f(1.0f, 1.0f);gl.glVertex3f(0.4f, 0.5f, 0.3f);
+    gl.glTexCoord2f(1.0f, 1.0f);gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+    gl.glEnd();
 
-        // Left face (Cyan Wall)
-        gl.glColor3f(0.0f, 1.0f, 1.0f); // Cyan
-        gl.glVertex3f(-1.5f, -1.0f, -1.0f); // Bottom Front
-        gl.glVertex3f(-1.5f, -1.0f, 1.5f); // Top Front
-        gl.glVertex3f(-1.5f, 1.0f, 1.5f); // Top Back
-        gl.glVertex3f(-1.5f, 1.0f, -1.0f); // Bottom Back
+    // Back face (outer)
+    gl.glBegin(GL.GL_LINE_LOOP);
+    gl.glVertex3f(-0.45f, 0.0f, -0.35f);
+    gl.glVertex3f(0.45f, 0.0f, -0.35f);
+    gl.glVertex3f(0.45f, 0.5f, -0.35f);
+    gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+    gl.glEnd();
 
+    // Back face (inner)
+    gl.glBegin(GL.GL_LINE_LOOP);
+    gl.glVertex3f(-0.4f, 0.0f, -0.3f);
+    gl.glVertex3f(0.4f, 0.0f, -0.3f);
+    gl.glVertex3f(0.4f, 0.5f, -0.3f);
+    gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+    gl.glEnd();
+
+    // Left face (outer)
+    gl.glBegin(GL.GL_LINE_LOOP);
+    gl.glVertex3f(-0.45f, 0.0f, -0.35f);
+    gl.glVertex3f(-0.45f, 0.0f, 0.35f);
+    gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+    gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+    gl.glEnd();
+
+        // Right face (outer)
+        gl.glBegin(GL.GL_LINE_LOOP);
+        gl.glVertex3f(0.45f, 0.0f, -0.35f);
+        gl.glVertex3f(0.45f, 0.0f, 0.35f);
+        gl.glVertex3f(0.45f, 0.5f, 0.35f);
+        gl.glVertex3f(0.45f, 0.5f, -0.35f);
         gl.glEnd();
 
-        // Draw Pintu
-        gl.glPushMatrix();
-        gl.glTranslatef(-0.1f, -1.0f, -0.99f); // Pintu diletakkan di depan dinding, sejajar dengan lantai
-        gl.glRotatef(doorRotation, 0.0f, 1.0f, 0.0f); // Rotasi pintu
-        gl.glColor3f(0.5f, 0.35f, 0.05f); // Brown
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.2f, 0.0f, 0.0f);
-        gl.glVertex3f(0.2f, 0.0f, 0.0f);
-        gl.glVertex3f(0.2f, 1.0f, 0.01f); // Mengubah tinggi pintu menjadi 1.0f
-        gl.glVertex3f(-0.2f, 1.0f, 0.0f); // Mengubah koordinat x menjadi -0.2f
+        // Draw lines for the edges of the top face
+        gl.glBegin(GL.GL_LINES);
+        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
+        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
+
+        gl.glVertex3f(0.45f, 0.5f, 0.35f);
+        gl.glVertex3f(0.45f, 0.5f, -0.35f);
+
+        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
+        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
+
+        gl.glVertex3f(0.4f, 0.5f, 0.3f);
+        gl.glVertex3f(0.4f, 0.5f, -0.3f);
         gl.glEnd();
+
         gl.glPopMatrix();
+        
         
         // Draw Wastapel
         gl.glPushMatrix();
@@ -177,11 +412,11 @@ public class Bathroom3D implements GLEventListener, KeyListener {
             gl.glVertex3f((float)(0.2 * Math.cos(angle)), (float)(0.2 * Math.sin(angle)), height);
         }
         gl.glEnd();
-        gl.glPopMatrix();
-
-        gl.glPopMatrix();
-        
-        // draw Cermin 
+//        gl.glPopMatrix
+                
+                gl.glPopMatrix();
+                
+                // draw Cermin 
         gl.glPushMatrix();
         gl.glTranslatef(-1.5f, -0.13f, -0.4f); // Posisi wastafel
         gl.glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // Rotasi agar wastafel menghadap ke depan
@@ -210,7 +445,8 @@ public class Bathroom3D implements GLEventListener, KeyListener {
         gl.glPopMatrix();
 
         // Menggambar lingkaran di bagian tengah dengan warna putih
-        gl.glColor3f(1.0f, 1.0f, 1.0f); // Warna putih
+         gl.glColor4f(0.0f, 1.0f, 1.0f, 1.0f); // Biru terang
+
         gl.glTranslatef(0.0f, 0.0f, 0.06f); // Geser ke atas untuk berada di atas bagian tengah
         glu.gluDisk(qOuter, 0.0f, 0.13f, 32, 1); // Menggambar lingkaran di tengah dengan radius sesuai dengan radius bagian dalam
 
@@ -236,177 +472,50 @@ public class Bathroom3D implements GLEventListener, KeyListener {
 
         gl.glPopMatrix();
         
-        // Draw Bathtub
-        gl.glPushMatrix();
-        gl.glTranslatef(0.0f, -0.96f, 1.0f); // Menempatkan bak mandi di tengah ruangan, sedikit di atas lantai
-        gl.glColor3f(0.5f, 0.5f, 0.5f); // Abu-abu
+        // draw Shower
+gl.glPushMatrix();
+gl.glTranslatef(-1.5f, 0.19f, 1.1f); // Posisi shower
+gl.glRotatef(90.0f, 0.0f, 1.0f, 0.0f); // Rotasi agar shower menghadap ke depan
+gl.glColor3f(0.5f, 0.5f, 0.5f); // Abu-abu
 
-        // Draw the faces of the bathtub
-        // Front face (outer)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glEnd();
+// Objek quadric untuk bagian lurus
+GLUquadric qOuter3 = glu.gluNewQuadric();
+glu.gluQuadricNormals(qOuter3, GLU.GLU_SMOOTH); // Atur normal vektor untuk objek quadric
 
-        // Front face (inner)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glEnd();
+// Menggambar silinder lurus untuk shower dengan radius yang lebih kecil dan tinggi yang lebih panjang
+glu.gluCylinder(qOuter3, 0.015f, 0.015f, 0.35f, 32, 32); // Ubah nilai radius menjadi lebih kecil
 
-        // Top face (front)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glEnd();
+// Membuat bagian melengkung
+gl.glPushMatrix();
+gl.glTranslatef(0.0f, 0.0f, 0.3f); // Geser ke ujung silinder lurus
+for (int i = 0; i < 10; i++) {
+    gl.glTranslatef(0.0f, 0.0f, 0.03f); // Geser sedikit ke depan
+    gl.glRotatef(9.0f, 1.0f, 0.0f, 0.0f); // Rotasi sedikit ke bawah
+    glu.gluCylinder(qOuter3, 0.015f, 0.015f, 0.03f, 32, 32); // Menggambar segmen silinder pendek
+}
 
-        // Back face (outer)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glEnd();
+// Tutup bagian ujung bawah
+gl.glTranslatef(0.0f, 0.0f, 0.05f); // Geser ke ujung silinder pendek
+//glu.gluDisk(qOuter3, 0.0f, 0.015f, 32, 1); // Tutup ujung bawah dengan disk
+gl.glPopMatrix(); // Pop transformasi untuk lengkungan
+gl.glPopMatrix(); // Pop transformasi utama
 
-        // Back face (inner)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-        gl.glEnd();
+     // draw very small cone facing upward
+gl.glPushMatrix();
+gl.glTranslatef(-1.0f, -0.1f, 1.1f); // Posisi kerucut
+gl.glRotatef(-90.0f, 1.0f, 0.0f, 0.0f); // Rotasi agar kerucut menghadap ke atas
+gl.glColor3f(0.5f, 0.5f, 0.5f);
 
-        // Top face (back)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-        gl.glEnd();
+// Objek quadric untuk kerucut
+GLUquadric qCone = glu.gluNewQuadric();
+glu.gluQuadricNormals(qCone, GLU.GLU_SMOOTH); // Atur normal vektor untuk objek quadric
 
-        // Left face (outer)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(-0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glEnd();
+// Menggambar kerucut menghadap ke atas dengan radius atas lebih besar dan radius bawah lebih kecil
+glu.gluCylinder(qCone, 0.11f, 0.0f, 0.10f, 8, 8); // Radius atas 0.02, radius bawah 0.0, tinggi 0.05
 
-        // Left face (inner)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(-0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-        gl.glEnd();
+gl.glPopMatrix(); // Pop transformasi utama
 
-        // Top face (left)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-        gl.glEnd();
-
-        // Right face (outer)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glEnd();
-
-        // Right face (inner)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glEnd();
-
-        // Top face (right)
-        gl.glBegin(GL.GL_QUADS);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glEnd();
-
-        // Draw lines around the edges of the bathtub
-        gl.glLineWidth(2.0f); // Increase line width
-        gl.glColor3f(0.0f, 0.0f, 0.0f); // Black
-
-        // Front face (outer)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(-0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glEnd();
-
-        // Front face (inner)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(-0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(0.4f, 0.0f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glEnd();
-
-        // Back face (outer)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(-0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glEnd();
-
-        // Back face (inner)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(-0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(0.4f, 0.0f, -0.3f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-        gl.glEnd();
-
-        // Left face (outer)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(-0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(-0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-        gl.glEnd();
-
-        // Right face (outer)
-        gl.glBegin(GL.GL_LINE_LOOP);
-        gl.glVertex3f(0.45f, 0.0f, -0.35f);
-        gl.glVertex3f(0.45f, 0.0f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-        gl.glEnd();
-
-        // Draw lines for the edges of the top face
-        gl.glBegin(GL.GL_LINES);
-        gl.glVertex3f(-0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(-0.45f, 0.5f, -0.35f);
-
-        gl.glVertex3f(0.45f, 0.5f, 0.35f);
-        gl.glVertex3f(0.45f, 0.5f, -0.35f);
-
-        gl.glVertex3f(-0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(-0.4f, 0.5f, -0.3f);
-
-        gl.glVertex3f(0.4f, 0.5f, 0.3f);
-        gl.glVertex3f(0.4f, 0.5f, -0.3f);
-        gl.glEnd();
-
-        gl.glPopMatrix();
-    }
+}
 
     @Override
     public void reshape(GLAutoDrawable drawable, int x, int y, int width, int height) {
